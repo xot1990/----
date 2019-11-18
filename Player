@@ -1,0 +1,94 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Player : MonoBehaviour
+{
+    // Fire
+    public Transform laser;
+    public List<KeyCode> shootButton;
+    public float laserDistance = 0.2f;
+    public float timeBetweenFires = 0.3f;
+    private float timeTilNextFire = 0.0f;
+
+      
+        
+    
+   
+
+
+    // Move
+	public List<KeyCode> upButton;
+    public List<KeyCode> downButton;
+    public List<KeyCode> leftBitton;
+    public List<KeyCode> rightButton;
+
+    public float playerspeed;
+    private float currentspeed;
+    private Vector3 lastMovement = new Vector3();
+
+	
+	
+	void Update ()
+    {
+        Rotation();
+        Movement();
+
+        foreach (KeyCode element in shootButton)
+        {
+            if (Input.GetKey(element) && timeTilNextFire <0)
+            {
+                timeTilNextFire = timeBetweenFires;
+                ShootLaser();
+                break;
+            }
+        }
+        timeTilNextFire -= Time.deltaTime;
+    
+	}
+    void Rotation()
+    {
+        
+    }
+    void Movement()
+    {
+        Vector3 movement = new Vector3();
+
+        movement += MoveIfPressed(upButton, Vector3.up);
+        movement += MoveIfPressed(downButton, Vector3.down);
+        movement += MoveIfPressed(leftBitton, Vector3.left);
+        movement += MoveIfPressed(rightButton, Vector3.right);
+
+        movement.Normalize();
+
+        if (movement.magnitude > 0)
+        {
+            currentspeed = playerspeed;
+            this.transform.Translate(movement * Time.deltaTime * playerspeed, Space.World);
+            lastMovement = movement;
+        }
+        else
+        {
+            this.transform.Translate(movement * Time.deltaTime * currentspeed, Space.World);
+            currentspeed *= 0.9f;
+        }
+    }
+    Vector3 MoveIfPressed(List<KeyCode> keyList, Vector3 Movement)
+    {
+        foreach (KeyCode elemet in keyList)
+        {
+            if(Input.GetKey (elemet))
+            {
+                return Movement;
+            }
+        }
+        return Vector3.zero;
+    }
+    void ShootLaser()
+    {
+      
+        float posX = this.transform.position.x + (Mathf.Cos((transform.localEulerAngles.z - 90) * Mathf.Deg2Rad) * -laserDistance);
+        float posY = this.transform.position.y + (Mathf.Sin((transform.localEulerAngles.z - 90) * Mathf.Deg2Rad) * -laserDistance);
+        Instantiate(laser, new Vector3(posX, posY, 0), this.transform.rotation);
+    }
+}
