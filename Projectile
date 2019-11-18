@@ -1,0 +1,51 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Projectile : MonoBehaviour
+{
+    private float LifeTime = 10.5f;
+    public int damage = 1;
+    private Transform player;
+    public float speedshot = 1.5f;
+    Vector3 delta = new Vector3();
+    private Rigidbody2D b;
+    private Collider2D box;
+    private Vector3 center;
+
+
+    void Start ()
+    {
+        box = GetComponent<Collider2D>();
+        center = box.bounds.size;
+        Destroy(gameObject, LifeTime);
+        player = GameObject.Find("Player").transform;
+        b = GetComponent<Rigidbody2D>();
+        
+        
+    }
+
+
+    void Update()
+    {
+        Enemy enemy = GameObject.FindGameObjectWithTag("Enemy").GetComponent<Enemy>();
+        Vector3 delta = player.position - transform.position;
+        Debug.Log(enemy.Min.x);
+        if (enemy.time == 10)
+        {
+            b.velocity = delta * speedshot;
+        }
+        if (transform.position.x  > enemy.Max.x && transform.position.x  < enemy.Min.x)
+        {
+            if (transform.position.y  > enemy.Max.y && transform.position.y  < enemy.Min.y)
+            {
+                Destroy(gameObject);
+            }
+            
+        }
+        
+
+
+    }
+
+}
