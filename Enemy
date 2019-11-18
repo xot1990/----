@@ -1,0 +1,127 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Enemy : MonoBehaviour {
+
+    
+    public float speedship = 2.0f;
+    public int time = 0;
+    private Rigidbody2D Player;
+    private Collider2D box;
+    public Vector3 Max;
+    public Vector3 Min;
+    private int dirX;
+    private int dirY;
+    private Vector3 center;
+    public Transform projectile;
+    public float laserDistance = 0.2f;
+    private Transform player;
+    Vector3 delta = new Vector3();
+    Vector2 X = new Vector2(1, 0);
+    Vector2 Y = new Vector2(0, 1);
+   
+    
+
+
+    void Start ()
+    {
+        box = GetComponent<Collider2D>();
+        Player = GetComponent<Rigidbody2D>();
+        Min = Camera.main.ViewportToWorldPoint(new Vector2(0,0));
+        Max = Camera.main.ViewportToWorldPoint(new Vector2(1,1));
+        center = box.bounds.size;
+        player = GameObject.Find("Player").transform;
+       
+    }
+	
+	
+	void Update ()
+    {
+        Debug.Log(time);
+        Timer();
+        RandomMove();
+        Shot();
+    }
+
+    void Timer()
+    {
+        time -= 1;
+        if (time <= 0)
+        {
+            time = 100;
+        }
+
+    }
+    void RandomMove()
+    {
+        if ((box.transform.position.x + center.x/2) < Max.x && (box.transform.position.x - center.x / 2) > Min.x)
+        {
+            if ((box.transform.position.y + center.y / 2) < Max.y && (box.transform.position.y - center.y / 2) > Min.y)
+            {
+                RandonNam();
+                Move();
+
+            }
+            else
+            {
+                Stop();
+                RandonNam();
+                MoveNow();
+            }
+
+        }
+        else
+        {
+            Stop();
+            RandonNam();
+            MoveNow();
+        }
+    }
+    void RandonNam()
+    {
+       dirX = Random.Range(-1, 2);
+        while (dirX == 0)
+        {
+            dirX = Random.Range(-1, 2);
+        }
+       dirY = Random.Range(-1, 2);
+        while (dirY == 0)
+        {
+            dirY = Random.Range(-1, 2);
+        }
+    }
+    void Move()
+    {
+        if (time == 10)
+        {
+            Player.velocity = new Vector2(dirX * speedship, dirY * speedship);
+        }
+        
+    }
+    void MoveNow()
+    {
+        Player.velocity = new Vector2(dirX * speedship, dirY * speedship);
+    }
+    void Stop()
+    {
+        this.transform.Translate(-Player.velocity*Time.deltaTime*speedship);
+        Player.velocity = new Vector2(0, 0);
+    }
+    void Shot()
+    {
+        if (time == 50)
+        {
+            float angle;
+
+            delta = player.position - transform.position;
+            angle = Vector2.Angle(X, delta);
+
+            float posX = this.transform.position.x + (Mathf.Cos((transform.localEulerAngles.z - 90) * Mathf.Deg2Rad) * -laserDistance);
+            float posY = this.transform.position.y + (Mathf.Sin((transform.localEulerAngles.z - 90) * Mathf.Deg2Rad) * -laserDistance);
+            Instantiate(projectile, new Vector3(posX, posY, 0), Quaternion.Euler(0,0,angle));
+        }
+        
+    }
+   
+}
